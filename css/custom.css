@@ -1,7 +1,39 @@
 body {
-	/*background: url("images/whitey.png") repeat;*/
-	/*background: url("images/gridme.png") repeat;*/
+	font-size: 12px !important;
+
+    /*background-image: url("images/8.png");*/
+    /*background-image: url("images/foggy_birds.png");*/
+    /*position: fixed; */
+
+    /*background-image: url("images/8m-1.jpg") no-repeat center center fixed;
+    background-repeat: repeat;
+    background-size: 100%;
+    width:100%;
+    height:100%;*/
+
+    /*background-image: url("images/11.png");
+    background-repeat: repeat;*/
+    /* background-size: 100%;
+    width:100%;
+    height:100%;*/
+
+    /*background-repeat: no-repeat;*/
+    /*background-attachment: scroll;*/
+    /*background-position: center center;*/
+    /*background-size: cover; // this makes img full-screen (full-width & full-height)*/
+
+    /*background-size:     cover;                      /* <------ */
+    /*background-repeat:   no-repeat;*/
+    /*background-position: center center;  */
+
+    background: url("images/3.jpg") no-repeat center center fixed;
+    -webkit-background-size: cover; 
+    -moz-background-size: cover;    
+    -o-background-size: cover;      
+    background-size: cover;
+
 }
+
 .navbar-default {
     /* border-color: #faebcc !important; */
     /* background-image: linear-gradient(#FFFFFF, #F1F1F1 60%, #EAEAEA) !important; */
@@ -30,4 +62,19 @@ body {
 }
 .crveno {
     background-color: #FF9F9F;
+}
+
+.navbar-default {
+    /* border-color: #faebcc !important; */
+    /* background-image: linear-gradient(#FFFFFF, #F1F1F1 60%, #EAEAEA) !important; */
+    border-color: #080808 !important;
+    background-image: linear-gradient(rgb(234, 234, 234), rgb(90, 85, 85) 60%, rgba(148, 148, 148, 0.92)) !important;
+}
+
+.navbar-default .navbar-brand {
+    color: #ffffff !important;
+}
+
+.navbar-default .navbar-nav > li > a {
+    color: #ffffff !important;
 }

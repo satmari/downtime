@@ -149,6 +149,7 @@ return [
 		//'Collective\Html\HtmlServiceProvider',
 		'Illuminate\Html\HtmlServiceProvider',
 		'Maatwebsite\Excel\ExcelServiceProvider',
+		'Bican\Roles\RolesServiceProvider',	
 
 	],
 
