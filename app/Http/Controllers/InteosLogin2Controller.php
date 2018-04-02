@@ -162,7 +162,7 @@ class InteosLogin2Controller extends Controller {
       where [DeclEnd] is not null and ([DeclCod] = 2 or [DeclCod] = 4 or [DeclCod] = 12 or [DeclCod] = 14) ) as MM on MM.DeclSta = DL.DeclEnd
       where DL.[DeclEnd] is not null and (dl.[DeclCod] <> 2 and dl.[DeclCod] <> 4 and dl.[DeclCod] <> 12 and dl.[DeclCod] <> 14) and mm.DeclCod is not null 
       
-      and Date >= '2018-03-28' 
+      and Date >= '2018-04-01' 
       and MTP.MaCod <> 'CHANGE LAYOUT'
       --and cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))/60 as varchar(10)) + ':' + right('0' + cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))%60 as varchar(2)),2) >= '0:30'
       
@@ -183,6 +183,14 @@ class InteosLogin2Controller extends Controller {
 	// dd($style_data);
 
 	$newarray = [];
+	Session::set('newarray', NULL);
+
+	$newarray_all = [];
+	Session::set('newarray_all', NULL);
+
+	$newarray_with_values = [];
+	Session::set('newarray_with_values', NULL);
+
 	for ($i=0; $i < count($data) ; $i++) { 
 		// dd($data[$i]);
 
@@ -261,51 +269,57 @@ class InteosLogin2Controller extends Controller {
 
 			} else {
 
-				// if (is_null($bd_data[0]->bd_category_id)) {
-				// $bd_category_id = "";
-				// } else {
-				// 	$bd_category_id = $bd_data[0]->bd_category_id;
-				// }
+				if (is_null($bd_data[0]->bd_category_id)) {
+				$bd_category_id = "";
+				} else {
+					$bd_category_id = $bd_data[0]->bd_category_id;
+				}
 
-				// if (is_null($bd_data[0]->bd_category)) {
-				// 	$bd_category = "";
-				// } else {
-				// 	$bd_category = $bd_data[0]->bd_category;
-				// }
+				if (is_null($bd_data[0]->bd_category)) {
+					$bd_category = "";
+				} else {
+					$bd_category = $bd_data[0]->bd_category;
+				}
 
-				// if (is_null($bd_data[0]->style)) {
-				// 	$style = "";
-				// } else {
-				// 	$style = $bd_data[0]->style;
-				// }
+				if (is_null($bd_data[0]->style)) {
+					$style = "";
+				} else {
+					$style = $bd_data[0]->style;
+				}
 
-				// array_push($newarray, array(
-				// "Date" => $data[$i]->Date,						//0
-		  //       "Start" => $data[$i]->Start,					//1
-		  //       "Finished" => $data[$i]->Finished,				//2
-		  //       "Declaration" => $data[$i]->Declaration,		//3
-		  //       "Type" => $data[$i]->Type,						//4
-		  //       "Machine" => $data[$i]->Machine,				//5	
-		  //       "Total_time" => $data[$i]->Total_time,			//6
-		  //       "Waiting_time" => $data[$i]->Waiting_time,		//7
-		  //       "Repair_time" => $data[$i]->Repair_time,		//8
-		  //       "Responsible" => $data[$i]->Responsible,		//9
-		  //       "ModuleName" => $data[$i]->ModuleName,			//10
-		  //       // "Solution" => $data[$i]->Solution,
-		  //       // "DeclCod" => $data[$i]->DeclCod,
-		  //       // "MechComment" => $bd_data[0]->mechanic_comment,
-		  //       "BD_Category_id" => $bd_category_id,			//11
-	   	  //     	"BD_Category" => $bd_category,					//12
-	   		//      	"Style" => $style								//13
-		  //       ));
-
-
+				array_push($newarray_with_values, array(
+				"Date" => $data[$i]->Date,						//0
+		        "Start" => $data[$i]->Start,					//1
+		        "Finished" => $data[$i]->Finished,				//2
+		        "Declaration" => $data[$i]->Declaration,		//3
+		        "Type" => $data[$i]->Type,						//4
+		        "Machine" => $data[$i]->Machine,				//5	
+		        "Total_time" => $data[$i]->Total_time,			//6
+		        "Waiting_time" => $data[$i]->Waiting_time,		//7
+		        "Repair_time" => $data[$i]->Repair_time,		//8
+		        "Responsible" => $data[$i]->Responsible,		//9
+		        "ModuleName" => $data[$i]->ModuleName,			//10
+		        // "Solution" => $data[$i]->Solution,
+		        // "DeclCod" => $data[$i]->DeclCod,
+		        // "MechComment" => $bd_data[0]->mechanic_comment,
+		        "BD_Category_id" => $bd_category_id,			//11
+	   	      	"BD_Category" => $bd_category,					//12
+	   		     "Style" => $style								//13
+		        ));
 			}
-	
 		}
 		// dd($newarray);
 	}
+
 	// dd($newarray);
+	$newarray_all = array_merge($newarray, $newarray_with_values);
+	// dd($newarray_all);
+
+	Session::set('newarray', $newarray);
+	Session::set('newarray_with_values', $newarray_with_values);
+	Session::set('newarray_all', $newarray_all);
+
+
 	return view('LineLeader.index', compact('newarray','leaderid','leader','module'));
 	}
 
@@ -314,6 +328,41 @@ class InteosLogin2Controller extends Controller {
 		$input = $request->all(); 
 		// dd($value);
 
+
+		// $newarray = Session::get('newarray');
+		$newarray_all = Session::get('newarray_all');
+		// dd($newarray_all);
+
+		foreach ($newarray_all as $line => $l) {
+			// dd($l['Date']);
+
+			$key = $l['Date']."_".$l['Start']."_".$l['Machine'];
+			// dd($key);
+
+			if ($key == $value) {
+				
+				// dd($key." and ".$value);
+
+				$date = $l['Date'];
+				$start = $l['Start'];
+				$finished = $l['Finished'];
+				$decl = $l['Declaration'];
+				$type = $l['Type'];
+				$machine = $l['Machine'];
+				$tot_time = $l['Total_time'];
+				$wait_time = $l['Waiting_time'];
+				$repair_time = $l['Repair_time'];
+				$responsible = $l['Responsible'];
+				$modulename = $l['ModuleName'];
+				$bd_category_id = $l['BD_Category_id'];
+				$bd_category = $l['BD_Category'];
+				$style = $l['Style'];
+
+			}
+		}
+		// dd($bd_category_id);
+
+		/*
 		$values = explode("_", $value);
 
 		// print_r($values);
@@ -335,6 +384,8 @@ class InteosLogin2Controller extends Controller {
 		$style = $values[13];
 		// dd($style);
 
+		*/
+
 		//BD Categories
 		$category_data = DB_Category::orderBy('bd_id')->lists('bd_rs','bd_id'); //pluck
 		// dd($category_data);
@@ -348,7 +399,7 @@ class InteosLogin2Controller extends Controller {
 
 	public function downtime_insert(Request $request)
 	{
-		$this->validate($request, ['bd_id'=>'required', 'style'=>'required|min:5']);
+		$this->validate($request, ['bd_id'=>'required', 'style'=>'required|min:5|max:9']);
 
 		$input = $request->all();
 		// dd($input);
@@ -548,7 +599,7 @@ class InteosLogin2Controller extends Controller {
       where [DeclEnd] is not null and ([DeclCod] = 2 or [DeclCod] = 4 or [DeclCod] = 12 or [DeclCod] = 14) ) as MM on MM.DeclSta = DL.DeclEnd
       where DL.[DeclEnd] is not null and (dl.[DeclCod] <> 2 and dl.[DeclCod] <> 4 and dl.[DeclCod] <> 12 and dl.[DeclCod] <> 14) and mm.DeclCod is not null 
       
-      and Date >= '2018-03-28' 
+      and Date >= '2018-04-01' 
       and MTP.MaCod <> 'CHANGE LAYOUT'
       --and cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))/60 as varchar(10)) + ':' + right('0' + cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))%60 as varchar(2)),2) >= '0:30'
       
@@ -569,6 +620,14 @@ class InteosLogin2Controller extends Controller {
 	// dd($style_data);
 
 	$newarray = [];
+	Session::set('newarray', NULL);
+
+	$newarray_all = [];
+	Session::set('newarray_all', NULL);
+
+	$newarray_with_values = [];
+	Session::set('newarray_with_values', NULL);
+
 	for ($i=0; $i < count($data) ; $i++) { 
 		// dd($data[$i]);
 
@@ -692,6 +751,16 @@ class InteosLogin2Controller extends Controller {
 		// dd($newarray);
 	}
 	// dd($newarray);
+
+	// dd($newarray);
+	$newarray_all = array_merge($newarray, $newarray_with_values);
+	// dd($newarray_all);
+
+	Session::set('newarray', $newarray);
+	Session::set('newarray_with_values', $newarray_with_values);
+	Session::set('newarray_all', $newarray_all);
+
+	
 	return view('LineLeader.index', compact('newarray','leaderid','leader','module'));
 	}
 

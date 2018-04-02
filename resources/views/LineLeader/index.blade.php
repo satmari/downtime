@@ -81,9 +81,17 @@
                             <td>{{ $line['BD_Category'] }}</td>
                             <td>{{ $line['Style'] }}</td>
 
-                            <td><a href="new_bd_info/{{ $line['Date'].'_'.$line['Start'].'_'.$line['Finished'].'_'.$line['Declaration'].'_'.$line['Type'].'_'.$line['Machine'].'_'.$line['Total_time'].'_'.$line['Waiting_time'].'_'.$line['Repair_time'].'_'.$line['Responsible'].'_'.$line['ModuleName'].'_'.$line['BD_Category'].'_'.$line['BD_Category_id'].'_'.$line['Style'] }}" class="btn btn-info btn-xs center-block" 
+                            {{-- 
+                            <td>
+                            <a href="new_bd_info/{{ $line['Date'].'_'.$line['Start'].'_'.$line['Finished'].'_'.$line['Declaration'].'_'.$line['Type'].'_'.$line['Machine'].'_'.$line['Total_time'].'_'.$line['Waiting_time'].'_'.$line['Repair_time'].'_'.$line['Responsible'].'_'.$line['ModuleName'].'_'.$line['BD_Category'].'_'.$line['BD_Category_id'].'_'.$line['Style'] }}" class="btn btn-info btn-xs center-block" 
+                                >Add/Edit</a>
+                            </td>
+                            --}}
                             
-                                >Add/Edit</a></td>
+                            <td>
+                            <a href="new_bd_info/{{ $line['Date'].'_'.$line['Start'].'_'.$line['Machine'] }}" class="btn btn-info btn-xs center-block" 
+                                >Add/Edit</a>
+                            </td>
 
                         </tr>
                         

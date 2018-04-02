@@ -26,7 +26,7 @@
 
 						<div class="panel-body">
 						<p>Downtime Category: <span style="color:red;">*</span></p>
-							{!! Form::select('bd_id', ['' => ''] + $category_data, $bd_category,['class' => 'form-control' , 'autofocus' => 'autofocus' ]) !!}
+							{!! Form::select('bd_id', ['' => ''] + $category_data, $bd_category_id,['class' => 'form-control' , 'autofocus' => 'autofocus' ]) !!}
 						</div>
 						
 						{{-- 
