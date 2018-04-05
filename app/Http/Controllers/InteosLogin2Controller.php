@@ -264,7 +264,7 @@ class InteosLogin2Controller extends Controller {
 		        // "MechComment" => $bd_data[0]->mechanic_comment,
 		        "BD_Category_id" => $bd_category_id,			//11
 	        	"BD_Category" => $bd_category,					//12
-	        	"Style" => $style								//13
+	        	"Style" => strtoupper($style)					//13
 		        ));
 
 			} else {
@@ -304,7 +304,7 @@ class InteosLogin2Controller extends Controller {
 		        // "MechComment" => $bd_data[0]->mechanic_comment,
 		        "BD_Category_id" => $bd_category_id,			//11
 	   	      	"BD_Category" => $bd_category,					//12
-	   		     "Style" => $style								//13
+	   		    "Style" => strtoupper($style)					//13
 		        ));
 			}
 		}
@@ -760,7 +760,7 @@ class InteosLogin2Controller extends Controller {
 	Session::set('newarray_with_values', $newarray_with_values);
 	Session::set('newarray_all', $newarray_all);
 
-	
+
 	return view('LineLeader.index', compact('newarray','leaderid','leader','module'));
 	}
 

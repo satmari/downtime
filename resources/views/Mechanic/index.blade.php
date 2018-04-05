@@ -15,6 +15,8 @@
                 </div>
 
                 <table class="table table-striped table-bordered" id="sort" 
+                data-show-export="true"
+                data-export-types="['excel']"
                 >
                 <!--
                 data-show-export="true"
@@ -47,6 +49,7 @@
                             <th>Fisnish</th>
                             <th>Declared</th>
                             <th>Module</th>
+                            <th>Responsible</th>
                             <th>M Type</th>
                             <th>Machine</th>
                             <th>Tot time</th>
@@ -71,6 +74,7 @@
                             <td>{{ $line['Finished'] }}</td>
                             <td>{{ $line['Declaration'] }}</td>
                             <td>{{ $line['ModuleName'] }}</td>
+                            <td>{{ $line['Responsible'] }}</td>
                             <td>{{ $line['Type'] }}</td>
                             <td>{{ $line['Machine'] }}</td>
                             <td>{{ $line['Total_time'] }}</td>
