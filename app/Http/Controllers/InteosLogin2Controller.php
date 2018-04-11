@@ -100,78 +100,159 @@ class InteosLogin2Controller extends Controller {
 
     	// dd($leaderid);
 
-    	$data = DB::connection('sqlsrv2')->select(DB::raw("SELECT cast(DL.[DeclSta] as date) as [Date],
-		substring(convert(char(10),
-		cast(DL.[DeclSta] as time(0))),1,5) as [Start],
-		substring(convert(char(10), Cast(case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end as time(0))),1,5) as [Finished], 
-		MDL.ModNam as [ModuleName], case when MM.Declaration IS null then dcl.Name else MM.Declaration end as [Declaration], 
-		MTP.MaCod as [Type], 
-		MCH.MachNum AS [Machine],
-		cast(datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end)/60 as varchar(10)) + ':' + right('0' + cast(datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end)%60 as varchar(2)),2) as [Total_time], 
-		cast(datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd])/60 as varchar(10)) + ':' +  RIGHT('0' + cast(datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd])%60 as varchar(2)),2) as [Waiting_time], 
-		cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))/60 as varchar(10)) + ':' + right('0' + cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))%60 as varchar(2)),2) as [Repair_time],
-		MM.Responsible, 
-		MM.Solution, 
-		MM.MecKey,
-		/*MM.Remark,
-        DL.[Module] as [xModule Nr],
-        DL.[DeclCod] as [xDeclCod],
-		DL.[DeclMch] as [xDeclMch],
-		DL.[DeclSta] as [xDeclSta],
-		DL.[DeclEnd] as [xDeclCodEnd],
-		DL.[DeclCat] as [xDeclCat],
-		DL.[DeclSol] as [xDeclSol],
-		DL.[MecKey] as [xMecKey],
-		Cast(case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end as smalldatetime) as [xDeclEndTotal],*/
-		mm.DeclCod
-  FROM [BdkCLZG].[dbo].[CNF_DeclLog] as DL 
-	  left join [BdkCLZG].[dbo].[WEA_Decl] as Dcl on dcl.Id = dl.DeclCod 
-      left join [BdkCLZG].[dbo].[CNF_Modules] as MDL on MDL.Module = DL.Module 
-      left join [BdkCLZG].[dbo].[WEA_PersData] as PERS on PERS.Cod = DL.MecKey
-      left join [BdkCLZG].[dbo].[CNF_MachPool] as MCH on MCH.Cod = DL.DeclMch
-      left join [BdkCLZG].[dbo].[CNF_MaTypes] as MTP on MTP.IntKey = MCH.MaTyCod
-      left join [BdkCLZG].[dbo].[WEA_Decl] as Decl on Decl.Id = DL.DeclSol
-      left join 
-      (SELECT cast([DeclSta] as date) as [Date],
-		substring(convert(char(10), cast([DeclSta] as time(0))),1,5) as [Start],
-		substring(convert(char(10), cast([DeclEnd] as time(0))),1,5) as [Finished],
-		MDL.ModNam as [ModuleName], 
-		dcl.Name as Declaration, 
-		MTP.MaCod as [Type], 
-		MCH.MachNum AS [Machine],
-		datediff(MINUTE,[DeclSta],[DeclEnd]) as Totaltime,
-		PERS.Name as [Responsible],
-		Decl.Name as [Solution], 
-		DL.[Remark],
-		DL.[Module],
-		[DeclCod],
-		[DeclMch],
-		[DeclSta],
-		[DeclEnd],
-		[DeclCat],
-		[DeclSol],
-		[MecKey]
-  FROM [BdkCLZG].[dbo].[CNF_DeclLog] as DL 
-	  left join [BdkCLZG].[dbo].[WEA_Decl] as Dcl on dcl.Id = dl.DeclCod 
-      left join [BdkCLZG].[dbo].[CNF_Modules] as MDL on MDL.Module = DL.Module 
-      left join [BdkCLZG].[dbo].[WEA_PersData] as PERS on PERS.Cod = DL.MecKey
-      left join [BdkCLZG].[dbo].[CNF_MachPool] as MCH on MCH.Cod = DL.DeclMch
-      left join [BdkCLZG].[dbo].[CNF_MaTypes] as MTP on MTP.IntKey = MCH.MaTyCod
-      left join [BdkCLZG].[dbo].[WEA_Decl] as Decl on Decl.Id = DL.DeclSol
-      
-      where [DeclEnd] is not null and ([DeclCod] = 2 or [DeclCod] = 4 or [DeclCod] = 12 or [DeclCod] = 14) ) as MM on MM.DeclSta = DL.DeclEnd
-      where DL.[DeclEnd] is not null and (dl.[DeclCod] <> 2 and dl.[DeclCod] <> 4 and dl.[DeclCod] <> 12 and dl.[DeclCod] <> 14) and mm.DeclCod is not null 
-      
-      and Date >= '2018-04-01' 
-      and MTP.MaCod <> 'CHANGE LAYOUT'
-      --and cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))/60 as varchar(10)) + ':' + right('0' + cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))%60 as varchar(2)),2) >= '0:30'
-      
-      and  ModuleName = '".$module."'
-     
-      order by Date desc ,Start desc
+    	if ($leaderid == '130') {
 
-	"));
-	// dd($data);
+		    	$data = DB::connection('sqlsrv2')->select(DB::raw("SELECT cast(DL.[DeclSta] as date) as [Date],
+				substring(convert(char(10),
+				cast(DL.[DeclSta] as time(0))),1,5) as [Start],
+				substring(convert(char(10), Cast(case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end as time(0))),1,5) as [Finished], 
+				MDL.ModNam as [ModuleName], case when MM.Declaration IS null then dcl.Name else MM.Declaration end as [Declaration], 
+				MTP.MaCod as [Type], 
+				MCH.MachNum AS [Machine],
+				cast(datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end)/60 as varchar(10)) + ':' + right('0' + cast(datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end)%60 as varchar(2)),2) as [Total_time], 
+				cast(datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd])/60 as varchar(10)) + ':' +  RIGHT('0' + cast(datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd])%60 as varchar(2)),2) as [Waiting_time], 
+				cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))/60 as varchar(10)) + ':' + right('0' + cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))%60 as varchar(2)),2) as [Repair_time],
+				MM.Responsible, 
+				MM.Solution, 
+				MM.MecKey,
+				PERS.Name as LineLeader,
+				/*MM.Remark,
+		        DL.[Module] as [xModule Nr],
+		        DL.[DeclCod] as [xDeclCod],
+				DL.[DeclMch] as [xDeclMch],
+				DL.[DeclSta] as [xDeclSta],
+				DL.[DeclEnd] as [xDeclCodEnd],
+				DL.[DeclCat] as [xDeclCat],
+				DL.[DeclSol] as [xDeclSol],
+				DL.[MecKey] as [xMecKey],
+				Cast(case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end as smalldatetime) as [xDeclEndTotal],*/
+				mm.DeclCod
+			  FROM [BdkCLZG].[dbo].[CNF_DeclLog] as DL 
+			  left join [BdkCLZG].[dbo].[WEA_Decl] as Dcl on dcl.Id = dl.DeclCod 
+		      left join [BdkCLZG].[dbo].[CNF_Modules] as MDL on MDL.Module = DL.Module 
+		      left join [BdkCLZG].[dbo].[WEA_PersData] as PERS on PERS.Cod = DL.MecKey
+		      left join [BdkCLZG].[dbo].[CNF_MachPool] as MCH on MCH.Cod = DL.DeclMch
+		      left join [BdkCLZG].[dbo].[CNF_MaTypes] as MTP on MTP.IntKey = MCH.MaTyCod
+		      left join [BdkCLZG].[dbo].[WEA_Decl] as Decl on Decl.Id = DL.DeclSol
+		      left join 
+		      (SELECT cast([DeclSta] as date) as [Date],
+				substring(convert(char(10), cast([DeclSta] as time(0))),1,5) as [Start],
+				substring(convert(char(10), cast([DeclEnd] as time(0))),1,5) as [Finished],
+				MDL.ModNam as [ModuleName], 
+				dcl.Name as Declaration, 
+				MTP.MaCod as [Type], 
+				MCH.MachNum AS [Machine],
+				datediff(MINUTE,[DeclSta],[DeclEnd]) as Totaltime,
+				PERS.Name as [Responsible],
+				Decl.Name as [Solution], 
+				DL.[Remark],
+				DL.[Module],
+				[DeclCod],
+				[DeclMch],
+				[DeclSta],
+				[DeclEnd],
+				[DeclCat],
+				[DeclSol],
+				[MecKey]
+		  FROM [BdkCLZG].[dbo].[CNF_DeclLog] as DL 
+			  left join [BdkCLZG].[dbo].[WEA_Decl] as Dcl on dcl.Id = dl.DeclCod 
+		      left join [BdkCLZG].[dbo].[CNF_Modules] as MDL on MDL.Module = DL.Module 
+		      left join [BdkCLZG].[dbo].[WEA_PersData] as PERS on PERS.Cod = DL.MecKey
+		      left join [BdkCLZG].[dbo].[CNF_MachPool] as MCH on MCH.Cod = DL.DeclMch
+		      left join [BdkCLZG].[dbo].[CNF_MaTypes] as MTP on MTP.IntKey = MCH.MaTyCod
+		      left join [BdkCLZG].[dbo].[WEA_Decl] as Decl on Decl.Id = DL.DeclSol
+		      
+		      where [DeclEnd] is not null and ([DeclCod] = 2 or [DeclCod] = 4 or [DeclCod] = 12 or [DeclCod] = 14) ) as MM on MM.DeclSta = DL.DeclEnd
+		      where DL.[DeclEnd] is not null and (dl.[DeclCod] <> 2 and dl.[DeclCod] <> 4 and dl.[DeclCod] <> 12 and dl.[DeclCod] <> 14) and mm.DeclCod is not null 
+		      and MM.ModuleName = mdl.ModNam and mm.Machine = MCH.MachNum /* composite key to connect lines with waiting time to lines with repairing time*/
+		      
+		      and Date >= '2018-04-01' 
+		      and MTP.MaCod <> 'CHANGE LAYOUT'
+		      --and cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))/60 as varchar(10)) + ':' + right('0' + cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))%60 as varchar(2)),2) >= '0:30'
+		     
+		      order by Date desc ,Start desc
+
+			"));
+			// dd($data);
+
+	} else {
+
+		$data = DB::connection('sqlsrv2')->select(DB::raw("SELECT cast(DL.[DeclSta] as date) as [Date],
+				substring(convert(char(10),
+				cast(DL.[DeclSta] as time(0))),1,5) as [Start],
+				substring(convert(char(10), Cast(case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end as time(0))),1,5) as [Finished], 
+				MDL.ModNam as [ModuleName], case when MM.Declaration IS null then dcl.Name else MM.Declaration end as [Declaration], 
+				MTP.MaCod as [Type], 
+				MCH.MachNum AS [Machine],
+				cast(datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end)/60 as varchar(10)) + ':' + right('0' + cast(datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end)%60 as varchar(2)),2) as [Total_time], 
+				cast(datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd])/60 as varchar(10)) + ':' +  RIGHT('0' + cast(datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd])%60 as varchar(2)),2) as [Waiting_time], 
+				cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))/60 as varchar(10)) + ':' + right('0' + cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))%60 as varchar(2)),2) as [Repair_time],
+				MM.Responsible, 
+				MM.Solution, 
+				MM.MecKey,
+				PERS.Name as LineLeader,
+				/*MM.Remark,
+		        DL.[Module] as [xModule Nr],
+		        DL.[DeclCod] as [xDeclCod],
+				DL.[DeclMch] as [xDeclMch],
+				DL.[DeclSta] as [xDeclSta],
+				DL.[DeclEnd] as [xDeclCodEnd],
+				DL.[DeclCat] as [xDeclCat],
+				DL.[DeclSol] as [xDeclSol],
+				DL.[MecKey] as [xMecKey],
+				Cast(case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end as smalldatetime) as [xDeclEndTotal],*/
+				mm.DeclCod
+			  FROM [BdkCLZG].[dbo].[CNF_DeclLog] as DL 
+			  left join [BdkCLZG].[dbo].[WEA_Decl] as Dcl on dcl.Id = dl.DeclCod 
+		      left join [BdkCLZG].[dbo].[CNF_Modules] as MDL on MDL.Module = DL.Module 
+		      left join [BdkCLZG].[dbo].[WEA_PersData] as PERS on PERS.Cod = DL.MecKey
+		      left join [BdkCLZG].[dbo].[CNF_MachPool] as MCH on MCH.Cod = DL.DeclMch
+		      left join [BdkCLZG].[dbo].[CNF_MaTypes] as MTP on MTP.IntKey = MCH.MaTyCod
+		      left join [BdkCLZG].[dbo].[WEA_Decl] as Decl on Decl.Id = DL.DeclSol
+		      left join 
+		      (SELECT cast([DeclSta] as date) as [Date],
+				substring(convert(char(10), cast([DeclSta] as time(0))),1,5) as [Start],
+				substring(convert(char(10), cast([DeclEnd] as time(0))),1,5) as [Finished],
+				MDL.ModNam as [ModuleName], 
+				dcl.Name as Declaration, 
+				MTP.MaCod as [Type], 
+				MCH.MachNum AS [Machine],
+				datediff(MINUTE,[DeclSta],[DeclEnd]) as Totaltime,
+				PERS.Name as [Responsible],
+				Decl.Name as [Solution], 
+				DL.[Remark],
+				DL.[Module],
+				[DeclCod],
+				[DeclMch],
+				[DeclSta],
+				[DeclEnd],
+				[DeclCat],
+				[DeclSol],
+				[MecKey]
+		  FROM [BdkCLZG].[dbo].[CNF_DeclLog] as DL 
+			  left join [BdkCLZG].[dbo].[WEA_Decl] as Dcl on dcl.Id = dl.DeclCod 
+		      left join [BdkCLZG].[dbo].[CNF_Modules] as MDL on MDL.Module = DL.Module 
+		      left join [BdkCLZG].[dbo].[WEA_PersData] as PERS on PERS.Cod = DL.MecKey
+		      left join [BdkCLZG].[dbo].[CNF_MachPool] as MCH on MCH.Cod = DL.DeclMch
+		      left join [BdkCLZG].[dbo].[CNF_MaTypes] as MTP on MTP.IntKey = MCH.MaTyCod
+		      left join [BdkCLZG].[dbo].[WEA_Decl] as Decl on Decl.Id = DL.DeclSol
+		      
+		      where [DeclEnd] is not null and ([DeclCod] = 2 or [DeclCod] = 4 or [DeclCod] = 12 or [DeclCod] = 14) ) as MM on MM.DeclSta = DL.DeclEnd
+		      where DL.[DeclEnd] is not null and (dl.[DeclCod] <> 2 and dl.[DeclCod] <> 4 and dl.[DeclCod] <> 12 and dl.[DeclCod] <> 14) and mm.DeclCod is not null 
+		      and MM.ModuleName = mdl.ModNam and mm.Machine = MCH.MachNum /* composite key to connect lines with waiting time to lines with repairing time*/
+		      
+		      and Date >= '2018-04-01' 
+		      and MTP.MaCod <> 'CHANGE LAYOUT'
+		      --and cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))/60 as varchar(10)) + ':' + right('0' + cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))%60 as varchar(2)),2) >= '0:30'
+		      
+		      and  ModuleName = '".$module."'
+		     
+		      order by Date desc ,Start desc
+
+			"));
+			// dd($data);
+
+	}
 	
 	
 	//Categories
@@ -356,7 +437,7 @@ class InteosLogin2Controller extends Controller {
 				$modulename = $l['ModuleName'];
 				$bd_category_id = $l['BD_Category_id'];
 				$bd_category = $l['BD_Category'];
-				$style = $l['Style'];
+				$style = strtoupper($l['Style']);
 
 			}
 		}
@@ -418,7 +499,7 @@ class InteosLogin2Controller extends Controller {
 		// $mech_coment = $input['new_mech_comment'];
 
 		$bd_category_id = $input['bd_id'];
-		$style = $input['style'];
+		$style = strtoupper($input['style']);
 
 		// $mechanicid = intval(Session::get('mechanicid'));
     	// $mechanic = Session::get('mechanic');
@@ -470,7 +551,7 @@ class InteosLogin2Controller extends Controller {
 				$table->leader = $leader;
 				$table->bd_category_id = $bd_category_id;
 				$table->bd_category = $bd_category;
-				$table->style = $style;
+				$table->style = strtoupper($style);
 				
 				$table->save();
 			// }
@@ -505,7 +586,7 @@ class InteosLogin2Controller extends Controller {
 				$table->leader = $leader;
 				$table->bd_category_id = $bd_category_id;
 				$table->bd_category = $bd_category;
-				$table->style = $style;
+				$table->style = strtoupper($style);
 				
 				$table->save();
 			// }
@@ -537,78 +618,159 @@ class InteosLogin2Controller extends Controller {
 
     	// dd($leaderid);
 
-    	$data = DB::connection('sqlsrv2')->select(DB::raw("SELECT cast(DL.[DeclSta] as date) as [Date],
-		substring(convert(char(10),
-		cast(DL.[DeclSta] as time(0))),1,5) as [Start],
-		substring(convert(char(10), Cast(case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end as time(0))),1,5) as [Finished], 
-		MDL.ModNam as [ModuleName], case when MM.Declaration IS null then dcl.Name else MM.Declaration end as [Declaration], 
-		MTP.MaCod as [Type], 
-		MCH.MachNum AS [Machine],
-		cast(datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end)/60 as varchar(10)) + ':' + right('0' + cast(datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end)%60 as varchar(2)),2) as [Total_time], 
-		cast(datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd])/60 as varchar(10)) + ':' +  RIGHT('0' + cast(datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd])%60 as varchar(2)),2) as [Waiting_time], 
-		cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))/60 as varchar(10)) + ':' + right('0' + cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))%60 as varchar(2)),2) as [Repair_time],
-		MM.Responsible, 
-		MM.Solution, 
-		MM.MecKey,
-		/*MM.Remark,
-        DL.[Module] as [xModule Nr],
-        DL.[DeclCod] as [xDeclCod],
-		DL.[DeclMch] as [xDeclMch],
-		DL.[DeclSta] as [xDeclSta],
-		DL.[DeclEnd] as [xDeclCodEnd],
-		DL.[DeclCat] as [xDeclCat],
-		DL.[DeclSol] as [xDeclSol],
-		DL.[MecKey] as [xMecKey],
-		Cast(case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end as smalldatetime) as [xDeclEndTotal],*/
-		mm.DeclCod
-  FROM [BdkCLZG].[dbo].[CNF_DeclLog] as DL 
-	  left join [BdkCLZG].[dbo].[WEA_Decl] as Dcl on dcl.Id = dl.DeclCod 
-      left join [BdkCLZG].[dbo].[CNF_Modules] as MDL on MDL.Module = DL.Module 
-      left join [BdkCLZG].[dbo].[WEA_PersData] as PERS on PERS.Cod = DL.MecKey
-      left join [BdkCLZG].[dbo].[CNF_MachPool] as MCH on MCH.Cod = DL.DeclMch
-      left join [BdkCLZG].[dbo].[CNF_MaTypes] as MTP on MTP.IntKey = MCH.MaTyCod
-      left join [BdkCLZG].[dbo].[WEA_Decl] as Decl on Decl.Id = DL.DeclSol
-      left join 
-      (SELECT cast([DeclSta] as date) as [Date],
-		substring(convert(char(10), cast([DeclSta] as time(0))),1,5) as [Start],
-		substring(convert(char(10), cast([DeclEnd] as time(0))),1,5) as [Finished],
-		MDL.ModNam as [ModuleName], 
-		dcl.Name as Declaration, 
-		MTP.MaCod as [Type], 
-		MCH.MachNum AS [Machine],
-		datediff(MINUTE,[DeclSta],[DeclEnd]) as Totaltime,
-		PERS.Name as [Responsible],
-		Decl.Name as [Solution], 
-		DL.[Remark],
-		DL.[Module],
-		[DeclCod],
-		[DeclMch],
-		[DeclSta],
-		[DeclEnd],
-		[DeclCat],
-		[DeclSol],
-		[MecKey]
-  FROM [BdkCLZG].[dbo].[CNF_DeclLog] as DL 
-	  left join [BdkCLZG].[dbo].[WEA_Decl] as Dcl on dcl.Id = dl.DeclCod 
-      left join [BdkCLZG].[dbo].[CNF_Modules] as MDL on MDL.Module = DL.Module 
-      left join [BdkCLZG].[dbo].[WEA_PersData] as PERS on PERS.Cod = DL.MecKey
-      left join [BdkCLZG].[dbo].[CNF_MachPool] as MCH on MCH.Cod = DL.DeclMch
-      left join [BdkCLZG].[dbo].[CNF_MaTypes] as MTP on MTP.IntKey = MCH.MaTyCod
-      left join [BdkCLZG].[dbo].[WEA_Decl] as Decl on Decl.Id = DL.DeclSol
-      
-      where [DeclEnd] is not null and ([DeclCod] = 2 or [DeclCod] = 4 or [DeclCod] = 12 or [DeclCod] = 14) ) as MM on MM.DeclSta = DL.DeclEnd
-      where DL.[DeclEnd] is not null and (dl.[DeclCod] <> 2 and dl.[DeclCod] <> 4 and dl.[DeclCod] <> 12 and dl.[DeclCod] <> 14) and mm.DeclCod is not null 
-      
-      and Date >= '2018-04-01' 
-      and MTP.MaCod <> 'CHANGE LAYOUT'
-      --and cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))/60 as varchar(10)) + ':' + right('0' + cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))%60 as varchar(2)),2) >= '0:30'
-      
-      and  ModuleName = '".$module."'
-     
-      order by Date desc ,Start desc
+    if ($leaderid == '130') {
 
-	"));
-	// dd($data);
+		    	$data = DB::connection('sqlsrv2')->select(DB::raw("SELECT cast(DL.[DeclSta] as date) as [Date],
+				substring(convert(char(10),
+				cast(DL.[DeclSta] as time(0))),1,5) as [Start],
+				substring(convert(char(10), Cast(case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end as time(0))),1,5) as [Finished], 
+				MDL.ModNam as [ModuleName], case when MM.Declaration IS null then dcl.Name else MM.Declaration end as [Declaration], 
+				MTP.MaCod as [Type], 
+				MCH.MachNum AS [Machine],
+				cast(datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end)/60 as varchar(10)) + ':' + right('0' + cast(datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end)%60 as varchar(2)),2) as [Total_time], 
+				cast(datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd])/60 as varchar(10)) + ':' +  RIGHT('0' + cast(datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd])%60 as varchar(2)),2) as [Waiting_time], 
+				cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))/60 as varchar(10)) + ':' + right('0' + cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))%60 as varchar(2)),2) as [Repair_time],
+				MM.Responsible, 
+				MM.Solution, 
+				MM.MecKey,
+				PERS.Name as LineLeader,
+				/*MM.Remark,
+		        DL.[Module] as [xModule Nr],
+		        DL.[DeclCod] as [xDeclCod],
+				DL.[DeclMch] as [xDeclMch],
+				DL.[DeclSta] as [xDeclSta],
+				DL.[DeclEnd] as [xDeclCodEnd],
+				DL.[DeclCat] as [xDeclCat],
+				DL.[DeclSol] as [xDeclSol],
+				DL.[MecKey] as [xMecKey],
+				Cast(case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end as smalldatetime) as [xDeclEndTotal],*/
+				mm.DeclCod
+			  FROM [BdkCLZG].[dbo].[CNF_DeclLog] as DL 
+			  left join [BdkCLZG].[dbo].[WEA_Decl] as Dcl on dcl.Id = dl.DeclCod 
+		      left join [BdkCLZG].[dbo].[CNF_Modules] as MDL on MDL.Module = DL.Module 
+		      left join [BdkCLZG].[dbo].[WEA_PersData] as PERS on PERS.Cod = DL.MecKey
+		      left join [BdkCLZG].[dbo].[CNF_MachPool] as MCH on MCH.Cod = DL.DeclMch
+		      left join [BdkCLZG].[dbo].[CNF_MaTypes] as MTP on MTP.IntKey = MCH.MaTyCod
+		      left join [BdkCLZG].[dbo].[WEA_Decl] as Decl on Decl.Id = DL.DeclSol
+		      left join 
+		      (SELECT cast([DeclSta] as date) as [Date],
+				substring(convert(char(10), cast([DeclSta] as time(0))),1,5) as [Start],
+				substring(convert(char(10), cast([DeclEnd] as time(0))),1,5) as [Finished],
+				MDL.ModNam as [ModuleName], 
+				dcl.Name as Declaration, 
+				MTP.MaCod as [Type], 
+				MCH.MachNum AS [Machine],
+				datediff(MINUTE,[DeclSta],[DeclEnd]) as Totaltime,
+				PERS.Name as [Responsible],
+				Decl.Name as [Solution], 
+				DL.[Remark],
+				DL.[Module],
+				[DeclCod],
+				[DeclMch],
+				[DeclSta],
+				[DeclEnd],
+				[DeclCat],
+				[DeclSol],
+				[MecKey]
+		  FROM [BdkCLZG].[dbo].[CNF_DeclLog] as DL 
+			  left join [BdkCLZG].[dbo].[WEA_Decl] as Dcl on dcl.Id = dl.DeclCod 
+		      left join [BdkCLZG].[dbo].[CNF_Modules] as MDL on MDL.Module = DL.Module 
+		      left join [BdkCLZG].[dbo].[WEA_PersData] as PERS on PERS.Cod = DL.MecKey
+		      left join [BdkCLZG].[dbo].[CNF_MachPool] as MCH on MCH.Cod = DL.DeclMch
+		      left join [BdkCLZG].[dbo].[CNF_MaTypes] as MTP on MTP.IntKey = MCH.MaTyCod
+		      left join [BdkCLZG].[dbo].[WEA_Decl] as Decl on Decl.Id = DL.DeclSol
+		      
+		      where [DeclEnd] is not null and ([DeclCod] = 2 or [DeclCod] = 4 or [DeclCod] = 12 or [DeclCod] = 14) ) as MM on MM.DeclSta = DL.DeclEnd
+		      where DL.[DeclEnd] is not null and (dl.[DeclCod] <> 2 and dl.[DeclCod] <> 4 and dl.[DeclCod] <> 12 and dl.[DeclCod] <> 14) and mm.DeclCod is not null 
+		      and MM.ModuleName = mdl.ModNam and mm.Machine = MCH.MachNum /* composite key to connect lines with waiting time to lines with repairing time*/
+		      
+		      and Date >= '2018-04-01' 
+		      and MTP.MaCod <> 'CHANGE LAYOUT'
+		      --and cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))/60 as varchar(10)) + ':' + right('0' + cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))%60 as varchar(2)),2) >= '0:30'
+		     
+		      order by Date desc ,Start desc
+
+			"));
+			// dd($data);
+
+	} else {
+
+		$data = DB::connection('sqlsrv2')->select(DB::raw("SELECT cast(DL.[DeclSta] as date) as [Date],
+				substring(convert(char(10),
+				cast(DL.[DeclSta] as time(0))),1,5) as [Start],
+				substring(convert(char(10), Cast(case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end as time(0))),1,5) as [Finished], 
+				MDL.ModNam as [ModuleName], case when MM.Declaration IS null then dcl.Name else MM.Declaration end as [Declaration], 
+				MTP.MaCod as [Type], 
+				MCH.MachNum AS [Machine],
+				cast(datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end)/60 as varchar(10)) + ':' + right('0' + cast(datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end)%60 as varchar(2)),2) as [Total_time], 
+				cast(datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd])/60 as varchar(10)) + ':' +  RIGHT('0' + cast(datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd])%60 as varchar(2)),2) as [Waiting_time], 
+				cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))/60 as varchar(10)) + ':' + right('0' + cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))%60 as varchar(2)),2) as [Repair_time],
+				MM.Responsible, 
+				MM.Solution, 
+				MM.MecKey,
+				PERS.Name as LineLeader,
+				/*MM.Remark,
+		        DL.[Module] as [xModule Nr],
+		        DL.[DeclCod] as [xDeclCod],
+				DL.[DeclMch] as [xDeclMch],
+				DL.[DeclSta] as [xDeclSta],
+				DL.[DeclEnd] as [xDeclCodEnd],
+				DL.[DeclCat] as [xDeclCat],
+				DL.[DeclSol] as [xDeclSol],
+				DL.[MecKey] as [xMecKey],
+				Cast(case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end as smalldatetime) as [xDeclEndTotal],*/
+				mm.DeclCod
+			  FROM [BdkCLZG].[dbo].[CNF_DeclLog] as DL 
+			  left join [BdkCLZG].[dbo].[WEA_Decl] as Dcl on dcl.Id = dl.DeclCod 
+		      left join [BdkCLZG].[dbo].[CNF_Modules] as MDL on MDL.Module = DL.Module 
+		      left join [BdkCLZG].[dbo].[WEA_PersData] as PERS on PERS.Cod = DL.MecKey
+		      left join [BdkCLZG].[dbo].[CNF_MachPool] as MCH on MCH.Cod = DL.DeclMch
+		      left join [BdkCLZG].[dbo].[CNF_MaTypes] as MTP on MTP.IntKey = MCH.MaTyCod
+		      left join [BdkCLZG].[dbo].[WEA_Decl] as Decl on Decl.Id = DL.DeclSol
+		      left join 
+		      (SELECT cast([DeclSta] as date) as [Date],
+				substring(convert(char(10), cast([DeclSta] as time(0))),1,5) as [Start],
+				substring(convert(char(10), cast([DeclEnd] as time(0))),1,5) as [Finished],
+				MDL.ModNam as [ModuleName], 
+				dcl.Name as Declaration, 
+				MTP.MaCod as [Type], 
+				MCH.MachNum AS [Machine],
+				datediff(MINUTE,[DeclSta],[DeclEnd]) as Totaltime,
+				PERS.Name as [Responsible],
+				Decl.Name as [Solution], 
+				DL.[Remark],
+				DL.[Module],
+				[DeclCod],
+				[DeclMch],
+				[DeclSta],
+				[DeclEnd],
+				[DeclCat],
+				[DeclSol],
+				[MecKey]
+		  FROM [BdkCLZG].[dbo].[CNF_DeclLog] as DL 
+			  left join [BdkCLZG].[dbo].[WEA_Decl] as Dcl on dcl.Id = dl.DeclCod 
+		      left join [BdkCLZG].[dbo].[CNF_Modules] as MDL on MDL.Module = DL.Module 
+		      left join [BdkCLZG].[dbo].[WEA_PersData] as PERS on PERS.Cod = DL.MecKey
+		      left join [BdkCLZG].[dbo].[CNF_MachPool] as MCH on MCH.Cod = DL.DeclMch
+		      left join [BdkCLZG].[dbo].[CNF_MaTypes] as MTP on MTP.IntKey = MCH.MaTyCod
+		      left join [BdkCLZG].[dbo].[WEA_Decl] as Decl on Decl.Id = DL.DeclSol
+		      
+		      where [DeclEnd] is not null and ([DeclCod] = 2 or [DeclCod] = 4 or [DeclCod] = 12 or [DeclCod] = 14) ) as MM on MM.DeclSta = DL.DeclEnd
+		      where DL.[DeclEnd] is not null and (dl.[DeclCod] <> 2 and dl.[DeclCod] <> 4 and dl.[DeclCod] <> 12 and dl.[DeclCod] <> 14) and mm.DeclCod is not null 
+		      and MM.ModuleName = mdl.ModNam and mm.Machine = MCH.MachNum /* composite key to connect lines with waiting time to lines with repairing time*/
+		      
+		      and Date >= '2018-04-01' 
+		      and MTP.MaCod <> 'CHANGE LAYOUT'
+		      --and cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))/60 as varchar(10)) + ':' + right('0' + cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))%60 as varchar(2)),2) >= '0:30'
+		      
+		      and  ModuleName = '".$module."'
+		     
+		      order by Date desc ,Start desc
+
+			"));
+			// dd($data);
+
+	}
 	
 	
 	//Categories
