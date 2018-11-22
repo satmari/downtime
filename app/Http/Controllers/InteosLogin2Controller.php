@@ -78,7 +78,7 @@ class InteosLogin2Controller extends Controller {
     		$module = $module_line." ".$module_name;
 
     		Session::set('module', $module);
-    	} 
+    	}
 
     	$leaderid = Session::get('leaderid');
     	$leader = Session::get('leader');
@@ -165,12 +165,17 @@ class InteosLogin2Controller extends Controller {
 		      where [DeclEnd] is not null and ([DeclCod] = 2 or [DeclCod] = 4 or [DeclCod] = 12 or [DeclCod] = 14) ) as MM on MM.DeclSta = DL.DeclEnd
 		      where DL.[DeclEnd] is not null and (dl.[DeclCod] <> 2 and dl.[DeclCod] <> 4 and dl.[DeclCod] <> 12 and dl.[DeclCod] <> 14) and mm.DeclCod is not null 
 		      and MM.ModuleName = mdl.ModNam and mm.Machine = MCH.MachNum /* composite key to connect lines with waiting time to lines with repairing time*/
+		      -- excluding lines with repairing time zero
+		      and (datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd])) <> 0
+
 		      
-		      and Date >= '2018-04-01' 
-		      and MTP.MaCod <> 'CHANGE LAYOUT'
+		      and Date >= '2018-04-15'
+		      --and MTP.MaCod <> 'CHANGE LAYOUT'
 		      --and cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))/60 as varchar(10)) + ':' + right('0' + cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))%60 as varchar(2)),2) >= '0:30'
 		     
-		      order by Date desc ,Start desc
+		      and  ModuleName <> 'SAMPLE' and ModuleName <> 'Z 999'
+
+		      order by ModuleName asc, Date desc ,Start desc
 
 			"));
 			// dd($data);
@@ -240,9 +245,11 @@ class InteosLogin2Controller extends Controller {
 		      where [DeclEnd] is not null and ([DeclCod] = 2 or [DeclCod] = 4 or [DeclCod] = 12 or [DeclCod] = 14) ) as MM on MM.DeclSta = DL.DeclEnd
 		      where DL.[DeclEnd] is not null and (dl.[DeclCod] <> 2 and dl.[DeclCod] <> 4 and dl.[DeclCod] <> 12 and dl.[DeclCod] <> 14) and mm.DeclCod is not null 
 		      and MM.ModuleName = mdl.ModNam and mm.Machine = MCH.MachNum /* composite key to connect lines with waiting time to lines with repairing time*/
-		      
-		      and Date >= '2018-04-01' 
-		      and MTP.MaCod <> 'CHANGE LAYOUT'
+		      -- excluding lines with repairing time zero
+		      and (datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd])) <> 0
+
+		      and Date >= '2018-04-15' 
+		      --and MTP.MaCod <> 'CHANGE LAYOUT'
 		      --and cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))/60 as varchar(10)) + ':' + right('0' + cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))%60 as varchar(2)),2) >= '0:30'
 		      
 		      and  ModuleName = '".$module."'
@@ -277,7 +284,7 @@ class InteosLogin2Controller extends Controller {
 
 		$key = $data[$i]->Date." ".$data[$i]->Start." ".$data[$i]->Machine;
 
-		$bd_data = DB::connection('sqlsrv')->select(DB::raw("SELECT bd_category_id,bd_category,style FROM downtimes WHERE bd_key = '".$key."'"));
+		$bd_data = DB::connection('sqlsrv')->select(DB::raw("SELECT bd_category_id,bd_category,style,style_prev FROM downtimes WHERE bd_key = '".$key."'"));
 		// dd($bd_data);
 
 		if (empty($bd_data)) {
@@ -300,7 +307,8 @@ class InteosLogin2Controller extends Controller {
 		        // "MechComment" => "",
 		        "BD_Category_id" => "",						//11
 		        "BD_Category" => "",						//12
-		        "Style" => ""								//13
+		        "Style" => "",								//13
+		        "Style_prev" => ""							//14
 
 		    ));
 
@@ -328,6 +336,12 @@ class InteosLogin2Controller extends Controller {
 					$style = $bd_data[0]->style;
 				}
 
+				if (is_null($bd_data[0]->style_prev)) {
+					$style_prev = "";
+				} else {
+					$style_prev = $bd_data[0]->style_prev;
+				}
+
 				array_push($newarray, array(
 				"Date" => $data[$i]->Date,						//0
 		        "Start" => $data[$i]->Start,					//1
@@ -345,7 +359,9 @@ class InteosLogin2Controller extends Controller {
 		        // "MechComment" => $bd_data[0]->mechanic_comment,
 		        "BD_Category_id" => $bd_category_id,			//11
 	        	"BD_Category" => $bd_category,					//12
-	        	"Style" => strtoupper($style)					//13
+	        	"Style" => strtoupper($style),					//13
+	        	"Style_prev" => strtoupper($style_prev)			//14
+
 		        ));
 
 			} else {
@@ -368,6 +384,12 @@ class InteosLogin2Controller extends Controller {
 					$style = $bd_data[0]->style;
 				}
 
+				if (is_null($bd_data[0]->style_prev)) {
+					$style_prev = "";
+				} else {
+					$style_prev = $bd_data[0]->style_prev;
+				}
+
 				array_push($newarray_with_values, array(
 				"Date" => $data[$i]->Date,						//0
 		        "Start" => $data[$i]->Start,					//1
@@ -385,7 +407,9 @@ class InteosLogin2Controller extends Controller {
 		        // "MechComment" => $bd_data[0]->mechanic_comment,
 		        "BD_Category_id" => $bd_category_id,			//11
 	   	      	"BD_Category" => $bd_category,					//12
-	   		    "Style" => strtoupper($style)					//13
+	   		    "Style" => strtoupper($style),   				//13
+	   		    "Style_prev" => strtoupper($style_prev)			//14
+
 		        ));
 			}
 		}
@@ -404,11 +428,11 @@ class InteosLogin2Controller extends Controller {
 	return view('LineLeader.index', compact('newarray','leaderid','leader','module'));
 	}
 
-	public function new_bd_info(Request $request, $value)
+	// ne koristi se vise
+	public function new_bd_info(Request $request, $value) 
 	{	
-		$input = $request->all(); 
+		$input = $request->all();
 		// dd($value);
-
 
 		// $newarray = Session::get('newarray');
 		$newarray_all = Session::get('newarray_all');
@@ -438,49 +462,96 @@ class InteosLogin2Controller extends Controller {
 				$bd_category_id = $l['BD_Category_id'];
 				$bd_category = $l['BD_Category'];
 				$style = strtoupper($l['Style']);
+				$style_prev = strtoupper($l['Style_prev']);
 
 			}
 		}
 		// dd($bd_category_id);
 
-		/*
-		$values = explode("_", $value);
-
-		// print_r($values);
-		// dd($values[0]);
-
-		$date = $values[0];
-		$start = $values[1];
-		$finished = $values[2];
-		$decl = $values[3];
-		$type = $values[4];
-		$machine = $values[5];
-		$tot_time = $values[6];
-		$wait_time = $values[7];
-		$repair_time = $values[8];
-		$responsible = $values[9];
-		$modulename = $values[10];
-		$bd_category_id = $values[11];
-		$bd_category = $values[12];
-		$style = $values[13];
-		// dd($style);
-
-		*/
-
 		//BD Categories
 		$category_data = DB_Category::orderBy('bd_id')->lists('bd_rs','bd_id'); //pluck
-		// dd($category_data);
+		
+		// $category_data = DB::connection('sqlsrv')->select(DB::raw("SELECT bd_id,bd_rs FROM b_d__machine_links WHERE machine_code = '".$type."' "));
+		// dd($category_data[0]->bd_id);
 
 		//Styles
 		$style_data = DB::connection('sqlsrv3')->select(DB::raw("SELECT style FROM styles WHERE LEN(style) < 9 ORDER BY style asc"));
 		// dd($style_data);
 
+		if ($type == 'CHANGE LAYOUT') {
+			// dd("machine type is CHANGE LAYOUT");
+
+			return view('LineLeader.add_cs', compact('date','start','finished','decl','type','machine','tot_time','wait_time','repair_time','responsible','modulename','bd_category_id','bd_category','style','style_prev','category_data','style_data'));
+		}
+
 		return view('LineLeader.add', compact('date','start','finished','decl','type','machine','tot_time','wait_time','repair_time','responsible','modulename','bd_category_id','bd_category','style','category_data','style_data'));
+	}
+
+	public function new_bd_info_test(Request $request, $value)
+	{	
+		$input = $request->all();
+		// dd($value);
+
+		// $newarray = Session::get('newarray');
+		$newarray_all = Session::get('newarray_all');
+		// dd($newarray_all);
+
+		foreach ($newarray_all as $line => $l) {
+			// dd($l['Date']);
+
+			$key = $l['Date']."_".$l['Start']."_".$l['Machine'];
+			// dd($key);
+
+			if ($key == $value) {
+				
+				// dd($key." and ".$value);
+
+				$date = $l['Date'];
+				$start = $l['Start'];
+				$finished = $l['Finished'];
+				$decl = $l['Declaration'];
+				$type = $l['Type'];
+				$machine = $l['Machine'];
+				$tot_time = $l['Total_time'];
+				$wait_time = $l['Waiting_time'];
+				$repair_time = $l['Repair_time'];
+				$responsible = $l['Responsible'];
+				$modulename = $l['ModuleName'];
+				$bd_category_id = $l['BD_Category_id'];
+				$bd_category = $l['BD_Category'];
+				$style = strtoupper($l['Style']);
+				$style_prev = strtoupper($l['Style_prev']);
+
+			}
+		}
+		// dd($bd_category_id);
+
+		//BD Categories
+		$category_data_o = DB_Category::orderBy('bd_id')->lists('bd_rs','bd_id'); //pluck
+		
+		// dd($type);
+		$category_data = DB::connection('sqlsrv')->select(DB::raw("SELECT l.bd_id,c.bd_rs FROM [downtime].[dbo].[b_d__machine_links] as l 
+			JOIN [downtime].[dbo].[d_b__categories] as c on l.bd_id = c.bd_id
+			WHERE machine_code = '".$type."' "));
+		// dd($category_data);
+		// dd("test");
+
+		//Styles
+		$style_data = DB::connection('sqlsrv3')->select(DB::raw("SELECT style FROM styles WHERE LEN(style) < 9 ORDER BY style asc"));
+		//dd($style_data);
+
+		if ($type == 'CHANGE LAYOUT') {
+			// dd("machine type is CHANGE LAYOUT");
+
+			return view('LineLeader.add_cs', compact('date','start','finished','decl','type','machine','tot_time','wait_time','repair_time','responsible','modulename','bd_category_id','bd_category','style','style_prev','category_data','style_data'));
+		}
+
+		return view('LineLeader.add_test', compact('date','start','finished','decl','type','machine','tot_time','wait_time','repair_time','responsible','modulename','bd_category_id','bd_category','style','category_data','category_data_o','style_data'));
 	}
 
 	public function downtime_insert(Request $request)
 	{
-		$this->validate($request, ['bd_id'=>'required', 'style'=>'required|min:5|max:9']);
+		$this->validate($request, ['bd_id'=>'required', 'style2'=>'required']);
 
 		$input = $request->all();
 		// dd($input);
@@ -499,7 +570,142 @@ class InteosLogin2Controller extends Controller {
 		// $mech_coment = $input['new_mech_comment'];
 
 		$bd_category_id = $input['bd_id'];
-		$style = strtoupper($input['style']);
+		// $bd_category_id = 'BD16';
+
+		// $style = strtoupper($input['style']);
+		$style2 = strtoupper($input['style2']);
+
+		// $mechanicid = intval(Session::get('mechanicid'));
+    	// $mechanic = Session::get('mechanic');
+		
+		$key = $date." ".$start." ".$machine;
+
+		$bd_data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM downtimes WHERE bd_key = '".$key."'"));
+		// dd($bd_data);
+		// dd($bd_data[0]->id);
+
+		$date = date('Y-m-d',strtotime($date));
+
+		$bd_category_list = DB::connection('sqlsrv')->select(DB::raw("SELECT bd_rs FROM d_b__categories WHERE bd_id = '".$bd_category_id."'"));
+		// dd($bd_category_list[0]->bd_rs);
+		$bd_category = $bd_category_list[0]->bd_rs;
+
+		$leaderid = intval(Session::get('leaderid'));
+    	$leader = Session::get('leader');
+    	// $module = Session::get('module');
+    	// dd($leaderid);
+
+		if (empty($bd_data)) {
+			// dd("empty");
+			// dd($total_time);
+			// var_dump("empty");
+
+			// try {
+
+				$table = new Downtime;
+				$table->bd_key = $key;
+				$table->bd_date = $date;
+				$table->start = $start;
+				$table->finished = $finished;
+				
+				$table->decl = $decl;
+				$table->type = $type;
+				$table->machine = $machine;
+				$table->total_time = $tot_time;
+				$table->wait_time = $wait_time;
+				$table->repair_time = $repair_time;
+				$table->responsible = $responsible;
+				$table->module = $modulename;
+
+				// $table->mechanic_id = $mechanicid;
+				// $table->mechanic = $mechanic;
+				// $table->mechanic_comment = $mech_coment;
+
+				$table->leader_id = $leaderid;
+				$table->leader = $leader;
+				$table->bd_category_id = $bd_category_id;
+				$table->bd_category = $bd_category;
+				$table->style = strtoupper($style2);
+				
+				$table->save();
+			// }
+			// catch (\Illuminate\Database\QueryException $e) {
+			// 	return view('Mechanic.error');
+			// }
+
+		} else {
+			// dd("not empty");
+
+			$table = Downtime::findOrFail($bd_data[0]->id);		
+
+			// try {
+				
+				// $table->bd_key = $key;
+				// $table->bd_date = $bd_date;
+				// $table->start = $start;
+				// $table->finished = $finished;
+				// $table->decl = $decl;
+				// $table->type = $type;
+				// $table->machine = $machine;
+				// $table->total_time = $total_time;
+				// $table->wait_time = $wait_time;
+				// $table->repair_time = $repair_time;
+				// $table->responsible = $responsible;
+
+				// $table->mechanic_id = $mechanicid;
+				// $table->mechanic = $mechanic;
+				// $table->mechanic_comment = $mech_coment;
+
+				$table->leader_id = $leaderid;
+				$table->leader = $leader;
+				$table->bd_category_id = $bd_category_id;
+				$table->bd_category = $bd_category;
+				$table->style = strtoupper($style2);
+				
+				$table->save();
+			// }
+			// catch (\Illuminate\Database\QueryException $e) {
+			// 	return view('Mechanic.error');			
+			// }
+		}
+
+		return Redirect::to('/inteoslogin2');
+	}
+
+	public function downtime_insert_cs(Request $request)
+	{
+		$this->validate($request, ['style2'=>'required', 'style_prev'=>'required']);
+
+		$input = $request->all();
+		// dd($input);
+
+		$date = $input['date'];
+		$start = $input['start'];
+		$finished = $input['finished'];
+		$decl = $input['decl'];
+		$type = $input['type'];
+		$machine = $input['machine'];
+		$tot_time = $input['tot_time'];
+		$wait_time = $input['wait_time'];
+		$repair_time = $input['repair_time'];
+		$responsible = $input['responsible'];
+		$modulename = $input['modulename'];
+		// $mech_coment = $input['new_mech_comment'];
+
+		// dd($input['bd_id']);
+		if ($input['bd_id'] == "" OR $input['bd_id'] == NULL) {
+
+			$bd_category_id = 'BD17'; // Promena modela/ Change Layout
+				
+		} else {
+
+			$bd_category_id = $input['bd_id'];
+		}
+
+		
+		// $style = strtoupper($input['style']);
+		$style = strtoupper($input['style2']);
+		$style_prev = strtoupper($input['style_prev']);
 
 		// $mechanicid = intval(Session::get('mechanicid'));
     	// $mechanic = Session::get('mechanic');
@@ -552,6 +758,7 @@ class InteosLogin2Controller extends Controller {
 				$table->bd_category_id = $bd_category_id;
 				$table->bd_category = $bd_category;
 				$table->style = strtoupper($style);
+				$table->style_prev = strtoupper($style_prev);
 				
 				$table->save();
 			// }
@@ -587,6 +794,7 @@ class InteosLogin2Controller extends Controller {
 				$table->bd_category_id = $bd_category_id;
 				$table->bd_category = $bd_category;
 				$table->style = strtoupper($style);
+				$table->style_prev = strtoupper($style_prev);
 				
 				$table->save();
 			// }
@@ -596,7 +804,6 @@ class InteosLogin2Controller extends Controller {
 		}
 
 		return Redirect::to('/inteoslogin2');
-
 	}
 
 	public function clear_session_lineleader()
@@ -683,12 +890,17 @@ class InteosLogin2Controller extends Controller {
 		      where [DeclEnd] is not null and ([DeclCod] = 2 or [DeclCod] = 4 or [DeclCod] = 12 or [DeclCod] = 14) ) as MM on MM.DeclSta = DL.DeclEnd
 		      where DL.[DeclEnd] is not null and (dl.[DeclCod] <> 2 and dl.[DeclCod] <> 4 and dl.[DeclCod] <> 12 and dl.[DeclCod] <> 14) and mm.DeclCod is not null 
 		      and MM.ModuleName = mdl.ModNam and mm.Machine = MCH.MachNum /* composite key to connect lines with waiting time to lines with repairing time*/
+		      -- excluding lines with repairing time zero
+		      and (datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd])) <> 0
 		      
-		      and Date >= '2018-04-01' 
-		      and MTP.MaCod <> 'CHANGE LAYOUT'
+		      
+		      and Date >= '2018-04-15' 
+		      --and MTP.MaCod <> 'CHANGE LAYOUT'
 		      --and cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))/60 as varchar(10)) + ':' + right('0' + cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))%60 as varchar(2)),2) >= '0:30'
 		     
-		      order by Date desc ,Start desc
+		      and  ModuleName <> 'SAMPLE' and ModuleName <> 'Z 999'
+
+		      order by ModuleName asc, Date desc ,Start desc
 
 			"));
 			// dd($data);
@@ -758,9 +970,12 @@ class InteosLogin2Controller extends Controller {
 		      where [DeclEnd] is not null and ([DeclCod] = 2 or [DeclCod] = 4 or [DeclCod] = 12 or [DeclCod] = 14) ) as MM on MM.DeclSta = DL.DeclEnd
 		      where DL.[DeclEnd] is not null and (dl.[DeclCod] <> 2 and dl.[DeclCod] <> 4 and dl.[DeclCod] <> 12 and dl.[DeclCod] <> 14) and mm.DeclCod is not null 
 		      and MM.ModuleName = mdl.ModNam and mm.Machine = MCH.MachNum /* composite key to connect lines with waiting time to lines with repairing time*/
+		      -- excluding lines with repairing time zero
+		      and (datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd])) <> 0
 		      
-		      and Date >= '2018-04-01' 
-		      and MTP.MaCod <> 'CHANGE LAYOUT'
+		      
+		      and Date >= '2018-04-15'
+		      --and MTP.MaCod <> 'CHANGE LAYOUT'
 		      --and cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))/60 as varchar(10)) + ':' + right('0' + cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))%60 as varchar(2)),2) >= '0:30'
 		      
 		      and  ModuleName = '".$module."'
@@ -795,7 +1010,7 @@ class InteosLogin2Controller extends Controller {
 
 		$key = $data[$i]->Date." ".$data[$i]->Start." ".$data[$i]->Machine;
 
-		$bd_data = DB::connection('sqlsrv')->select(DB::raw("SELECT bd_category_id,bd_category,style FROM downtimes WHERE bd_key = '".$key."'"));
+		$bd_data = DB::connection('sqlsrv')->select(DB::raw("SELECT bd_category_id,bd_category,style,style_prev FROM downtimes WHERE bd_key = '".$key."'"));
 		// dd($bd_data);
 
 		if (empty($bd_data)) {
@@ -818,7 +1033,8 @@ class InteosLogin2Controller extends Controller {
 		        // "MechComment" => "",
 		        "BD_Category_id" => "",						//11
 		        "BD_Category" => "",						//12
-		        "Style" => ""								//13
+		        "Style" => "",								//13
+		        "Style_prev" => ""							//14
 
 		    ));
 
@@ -846,6 +1062,12 @@ class InteosLogin2Controller extends Controller {
 					$style = $bd_data[0]->style;
 				}
 
+				if (is_null($bd_data[0]->style_prev)) {
+					$style_prev = "";
+				} else {
+					$style_prev = $bd_data[0]->style_prev;
+				}
+
 				array_push($newarray, array(
 				"Date" => $data[$i]->Date,						//0
 		        "Start" => $data[$i]->Start,					//1
@@ -863,7 +1085,9 @@ class InteosLogin2Controller extends Controller {
 		        // "MechComment" => $bd_data[0]->mechanic_comment,
 		        "BD_Category_id" => $bd_category_id,			//11
 	        	"BD_Category" => $bd_category,					//12
-	        	"Style" => $style								//13
+	        	"Style" => strtoupper($style), 					//13
+	        	"Style_prev" => strtoupper($style_prev)			//14
+
 		        ));
 
 			} else {
@@ -886,6 +1110,12 @@ class InteosLogin2Controller extends Controller {
 					$style = $bd_data[0]->style;
 				}
 
+				if (is_null($bd_data[0]->style_prev)) {
+					$style_prev = "";
+				} else {
+					$style_prev = $bd_data[0]->style_prev;
+				}
+
 				array_push($newarray, array(
 				"Date" => $data[$i]->Date,						//0
 		        "Start" => $data[$i]->Start,					//1
@@ -903,7 +1133,8 @@ class InteosLogin2Controller extends Controller {
 		        // "MechComment" => $bd_data[0]->mechanic_comment,
 		        "BD_Category_id" => $bd_category_id,			//11
 	   	      	"BD_Category" => $bd_category,					//12
-   		     	"Style" => $style								//13
+   		     	"Style" => strtoupper($style), 					//13
+   		     	"Style_prev" => strtoupper($style_prev)			//14
 		        ));
 
 
@@ -921,7 +1152,6 @@ class InteosLogin2Controller extends Controller {
 	Session::set('newarray', $newarray);
 	Session::set('newarray_with_values', $newarray_with_values);
 	Session::set('newarray_all', $newarray_all);
-
 
 	return view('LineLeader.index', compact('newarray','leaderid','leader','module'));
 	}

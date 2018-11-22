@@ -22,6 +22,8 @@ class CreateDBCategoriesTable extends Migration {
 			$table->string('bd_en')->nullable();
 			$table->string('bd_it')->nullable();
 
+			// $table->integer('priority')->nullable(); // added latter
+
 			$table->timestamps();
 		});
 	}

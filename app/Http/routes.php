@@ -30,7 +30,10 @@ Route::get('afterlogin2', 'InteosLogin2Controller@afterlogin');
 Route::get('afterlogin2all', 'InteosLogin2Controller@afterloginall');
 Route::post('logincheck2', 'InteosLogin2Controller@logincheck');
 Route::get('new_bd_info/{value}', 'InteosLogin2Controller@new_bd_info');
+Route::get('new_bd_info_test/{value}', 'InteosLogin2Controller@new_bd_info_test'); // for testing
 Route::post('downtime_insert2', 'InteosLogin2Controller@downtime_insert');
+Route::post('downtime_insert2_cs', 'InteosLogin2Controller@downtime_insert_cs');
+Route::post('downtime_insert2_test', 'InteosLogin2Controller@downtime_insert');
 Route::get('clear_session_lineleader', 'InteosLogin2Controller@clear_session_lineleader');
 
 // BD Category
@@ -42,7 +45,23 @@ Route::post('/bd_category/{id}', 'BDCategoryController@update');
 Route::get('/bd_category/delete/{id}', 'BDCategoryController@delete');
 Route::post('/bd_category/delete/{id}', 'BDCategoryController@delete');
 
+// Machine Type
+Route::get('/machine_type', 'Machine_typeController@index');
+Route::get('/machine_type_new', 'Machine_typeController@create');
+Route::post('/machine_type_insert', 'Machine_typeController@insert');
+Route::get('/machine_type/edit/{id}', 'Machine_typeController@edit');
+Route::post('/machine_type/{id}', 'Machine_typeController@update');
+Route::get('/machine_type/delete/{id}', 'Machine_typeController@delete');
+Route::post('/machine_type/delete/{id}', 'Machine_typeController@delete');
 
+// BD Machine Link
+Route::get('/bd_machine', 'BD_MachineController@index');
+Route::get('/bd_machine_new', 'BD_MachineController@create');
+Route::post('/bd_machine_insert', 'BD_MachineController@insert');
+// Route::get('/bd_machine/edit/{id}', 'BD_MachineController@edit');
+// Route::post('/bd_machine/{id}', 'BD_MachineController@update');
+Route::get('/bd_machine/delete/{id}', 'BD_MachineController@delete');
+Route::post('/bd_machine/delete/{id}', 'BD_MachineController@delete');
 
 Route::controllers([
 	'auth' => 'Auth\AuthController',

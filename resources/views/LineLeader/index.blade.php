@@ -15,6 +15,8 @@
                 </div>
 
                 <table class="table table-striped table-bordered" id="sort" 
+                data-show-export="true"
+                data-export-types="['excel']"
                 >
                 <!--
                 data-show-export="true"
@@ -57,6 +59,7 @@
                             <th>Style</th>
 
                             <th></th>
+                            
                         </tr>
                     </thead>
                     <tbody class="searchable">
@@ -88,10 +91,19 @@
                             </td>
                             --}}
                             
+                            {{-- 
                             <td>
                             <a href="new_bd_info/{{ $line['Date'].'_'.$line['Start'].'_'.$line['Machine'] }}" class="btn btn-info btn-xs center-block" 
                                 >Add/Edit</a>
                             </td>
+                            --}}
+                            
+                            
+                            <td>
+                            <a href="new_bd_info_test/{{ $line['Date'].'_'.$line['Start'].'_'.$line['Machine'] }}" class="btn btn-info btn-xs center-block" 
+                                >Add/Edit</a>
+                            </td>
+                            
 
                         </tr>
                         

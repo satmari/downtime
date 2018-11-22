@@ -39,6 +39,8 @@ class CreateDowntimesTable extends Migration {
 			$table->string('bd_category_id')->nullable();
 			$table->string('bd_category')->nullable();
 			$table->string('style')->nullable();
+
+			// $table->string('style_prev')->nullable(); //added latter
 			
 			$table->timestamps();
 

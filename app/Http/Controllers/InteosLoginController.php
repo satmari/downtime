@@ -144,6 +144,8 @@ class InteosLoginController extends Controller {
 		      where [DeclEnd] is not null and ([DeclCod] = 2 or [DeclCod] = 4 or [DeclCod] = 12 or [DeclCod] = 14) ) as MM on MM.DeclSta = DL.DeclEnd
 		      where DL.[DeclEnd] is not null and (dl.[DeclCod] <> 2 and dl.[DeclCod] <> 4 and dl.[DeclCod] <> 12 and dl.[DeclCod] <> 14) and mm.DeclCod is not null 
 		      and MM.ModuleName = mdl.ModNam and mm.Machine = MCH.MachNum /* composite key to connect lines with waiting time to lines with repairing time*/
+		      -- excluding lines with repairing time zero
+		      and (datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd])) <> 0
 
 		      and Date >= '2018-04-01' 
 		      and MTP.MaCod <> 'CHANGE LAYOUT'
@@ -219,11 +221,14 @@ class InteosLoginController extends Controller {
 		      where [DeclEnd] is not null and ([DeclCod] = 2 or [DeclCod] = 4 or [DeclCod] = 12 or [DeclCod] = 14) ) as MM on MM.DeclSta = DL.DeclEnd
 		      where DL.[DeclEnd] is not null and (dl.[DeclCod] <> 2 and dl.[DeclCod] <> 4 and dl.[DeclCod] <> 12 and dl.[DeclCod] <> 14) and mm.DeclCod is not null 
 		      and MM.ModuleName = mdl.ModNam and mm.Machine = MCH.MachNum /* composite key to connect lines with waiting time to lines with repairing time*/
+		      -- excluding lines with repairing time zero
+		      and (datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd])) <> 0
 
 		      and Date >= '2018-04-01' 
 		      and MTP.MaCod <> 'CHANGE LAYOUT'
 		      and cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))/60 as varchar(10)) + ':' + right('0' + cast((datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd]))%60 as varchar(2)),2) >= '0:30'
 		      
+
 			  and MM.MecKey = '".$mechanicid."'
 		     
 		      order by Date desc ,Start desc
@@ -593,6 +598,9 @@ class InteosLoginController extends Controller {
 	      where [DeclEnd] is not null and ([DeclCod] = 2 or [DeclCod] = 4 or [DeclCod] = 12 or [DeclCod] = 14) ) as MM on MM.DeclSta = DL.DeclEnd
 	      where DL.[DeclEnd] is not null and (dl.[DeclCod] <> 2 and dl.[DeclCod] <> 4 and dl.[DeclCod] <> 12 and dl.[DeclCod] <> 14) and mm.DeclCod is not null 
 	      and MM.ModuleName = mdl.ModNam and mm.Machine = MCH.MachNum /* composite key to connect lines with waiting time to lines with repairing time*/
+	      -- excluding lines with repairing time zero
+		  and (datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd])) <> 0
+		      
 
 	      and Date >= '2018-04-01' 
 	      and MTP.MaCod <> 'CHANGE LAYOUT'
@@ -666,6 +674,9 @@ class InteosLoginController extends Controller {
 	      where [DeclEnd] is not null and ([DeclCod] = 2 or [DeclCod] = 4 or [DeclCod] = 12 or [DeclCod] = 14) ) as MM on MM.DeclSta = DL.DeclEnd
 	      where DL.[DeclEnd] is not null and (dl.[DeclCod] <> 2 and dl.[DeclCod] <> 4 and dl.[DeclCod] <> 12 and dl.[DeclCod] <> 14) and mm.DeclCod is not null 
 	      and MM.ModuleName = mdl.ModNam and mm.Machine = MCH.MachNum /* composite key to connect lines with waiting time to lines with repairing time*/
+	      -- excluding lines with repairing time zero
+	      and (datediff(MINUTE,DL.[DeclSta],case when MM.DeclEnd IS null then DL.[DeclEnd] else MM.DeclEnd end) - datediff(MINUTE,DL.[DeclSta],DL.[DeclEnd])) <> 0
+		      
 	      
 	      and Date >= '2018-04-01' 
 	      and MTP.MaCod <> 'CHANGE LAYOUT'

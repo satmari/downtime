@@ -17,6 +17,7 @@
 	<link href="{{ asset('/css/jquery-ui.min.css') }}" rel='stylesheet' type='text/css'>
 	<link href="{{ asset('/css/custom.css') }}" rel='stylesheet' type='text/css'>
 	<link href="{{ asset('/css/app.css') }}" rel='stylesheet' type='text/css'>
+	<link href="{{ asset('/css/choosen.css') }}" rel='stylesheet' type='text/css'>
 
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -66,6 +67,8 @@
 					<li><a href="{{ url('/inteoslogin') }}">Mechanic Downtime</a></li>
 					<li><a href="{{ url('/inteoslogin2') }}">Lineleader Downtime</a></li>
 					<li><a href="{{ url('/bd_category') }}">BD Categories</a></li>
+					<li><a href="{{ url('/machine_type') }}">Machine Types</a></li>
+					<li><a href="{{ url('/bd_machine') }}">BD Category-Machine link</a></li>
 
 					@endif
 					
@@ -105,6 +108,7 @@
 	<!--<script src="{{ asset('/js/jspdf.min.js') }}" type="text/javascript" ></script>-->
 	<script src="{{ asset('/js/FileSaver.min.js') }}" type="text/javascript" ></script>
 	<script src="{{ asset('/js/bootstrap-table-export.js') }}" type="text/javascript" ></script>
+	<script src="{{ asset('/js/choosen.js') }}" type="text/javascript" ></script>
 
 	<script type="text/javascript">
 	   $.ajaxSetup({
@@ -118,6 +122,11 @@
 $(function() {
     	
 	$('#style').autocomplete({
+		minLength: 3,
+		autoFocus: true,
+		source: '{{ URL('getstyledata')}}'
+	});
+	$('#style_prev').autocomplete({
 		minLength: 3,
 		autoFocus: true,
 		source: '{{ URL('getstyledata')}}'
@@ -151,6 +160,10 @@ $(function() {
 	$('#sort').bootstrapTable({
     	
 	});
+
+	
+	$(".chosen").chosen();
+
 
 	//$('.table tr').each(function(){
   		
