@@ -37,11 +37,13 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="http://172.27.161.171/preparation"><b>Preparation App</b></a>
+				<a class="navbar-brand" href="http://172.27.161.171/preparation"><b>Preparation</b></a>
 				<a class="navbar-brand" href="#">|</a>
-				<a class="navbar-brand" href="http://172.27.161.171/trebovanje"><b>Trebovanje App</b></a>
+				<a class="navbar-brand" href="http://172.27.161.171/trebovanje"><b>Trebovanje</b></a>
 				<a class="navbar-brand" href="#">|</a>
-				<a class="navbar-brand" href="http://172.27.161.171/downtime"><b>Downtime App</b></a>
+				<a class="navbar-brand" href="http://172.27.161.171/downtime"><b>Downtime</b></a>
+				<a class="navbar-brand" href="#">|</a>
+				<a class="navbar-brand" href="http://172.27.161.171/cutting"><b>Cutting</b></a>
 				<a class="navbar-brand" href="#">|</a>
 				@if(Auth::check() && Auth::user()->level() == 4)
 				<a class="navbar-brand" href="http://172.27.161.172/pdm"><span style="color:red;"><b>PDM</b></span></a></li>
@@ -161,7 +163,6 @@ $(function() {
     	
 	});
 
-	
 	$(".chosen").chosen();
 
 
