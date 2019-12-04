@@ -72,10 +72,32 @@ class InteosLogin2Controller extends Controller {
 				$msg = 'Modul is not autenticated';
 				return view('InteosLogin2.error',compact('msg'));
 			}
-			$module_line = substr($module, 0, 1);
-    		$module_name = substr($module, 1, 3);
+			
+			/*
+			$crtica = substr($module, 1, 1);
+			// dd($module);
+
+			if ($crtica == "-") {
+
+				$module_line = substr($module, 0, 1);
+	    		$module_name = substr($module, 2, 3);
+	    		
+	    		$module = $module_line." ".$module_name;
+
+	    		Session::set('module', $module);	
+
+			} else {
+
+				$module_line = substr($module, 0, 1);
+	    		$module_name = substr($module, 1, 3);
+	    		
+	    		$module = $module_line." ".$module_name;
+
+	    		Session::set('module', $module);	
+			}
     		
     		$module = $module_line." ".$module_name;
+    		*/
 
     		Session::set('module', $module);
     	}
@@ -98,7 +120,7 @@ class InteosLogin2Controller extends Controller {
     	$leader = Session::get('leader');
     	$module = Session::get('module');
 
-    	// dd($leaderid);
+    	// dd($module);
 
     	if ($leaderid == '130') {
 
