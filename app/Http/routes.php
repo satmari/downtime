@@ -24,6 +24,37 @@ Route::get('new_bd_comment/{value}', 'InteosLoginController@new_bd_comment');
 Route::post('downtime_insert', 'InteosLoginController@downtime_insert');
 Route::get('clear_session_mechanic', 'InteosLoginController@clear_session_mechanic');
 
+//Mechanics Activity
+Route::get('activity', 'ActivityController@index');
+Route::get('afterlogin3', 'ActivityController@afterlogin');
+Route::post('logincheck3', 'ActivityController@logincheck');
+Route::get('activity_table', 'ActivityController@activity_table');
+
+Route::get('add_activity', 'ActivityController@add_activity');
+Route::get('stop_activity', 'ActivityController@stop_activity');
+// Route::get('stop_activity/{id}', 'ActivityController@stop_activity_id');
+Route::post('maintenance', 'ActivityController@maintenance');
+Route::post('setting', 'ActivityController@setting');
+
+Route::get('clear_session_mechanic2', 'ActivityController@clear_session_mechanic');
+
+// Machines
+Route::get('add_machine1', 'MechineController@index');
+Route::get('add_machine_id/{id}', 'MechineController@index_id');
+Route::post('add_machine', 'MechineController@add_machine');
+Route::get('/add_maintenance/{id}', 'MechineController@add_maintenance');
+Route::post('add_maintenance_confirm', 'MechineController@add_maintenance_confirm');
+
+// Maintenance
+Route::get('/maintenance', 'MaintenanceController@index');
+Route::get('/maintenance_new', 'MaintenanceController@create');
+Route::post('/maintenance_insert', 'MaintenanceController@insert');
+Route::get('/maintenance/edit/{id}', 'MaintenanceController@edit');
+Route::post('/maintenance/{id}', 'MaintenanceController@update');
+Route::get('/maintenance/delete/{id}', 'MaintenanceController@delete');
+Route::post('/maintenance/delete/{id}', 'MaintenanceController@delete');
+
+
 // Lineleader
 Route::get('inteoslogin2', 'InteosLogin2Controller@index');
 Route::get('afterlogin2', 'InteosLogin2Controller@afterlogin');

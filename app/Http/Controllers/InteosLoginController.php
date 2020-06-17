@@ -44,7 +44,23 @@ class InteosLoginController extends Controller {
 		$pin = $forminput['pin'];
 		// dd($pin);
 
-		$inteosmech = DB::connection('sqlsrv2')->select(DB::raw("SELECT Cod,Name FROM BdkCLZG.dbo.WEA_PersData WHERE Func = 2 AND FlgAct = 1 AND PinCode = '".$pin."'"));
+		// $inteosmech = DB::connection('sqlsrv2')->select(DB::raw("SELECT Cod,Name FROM BdkCLZG.dbo.WEA_PersData WHERE Func = 2 AND FlgAct = 1 AND PinCode = '".$pin."'"));
+		$inteosmech = DB::connection('sqlsrv2')->select(DB::raw("SELECT	Cod, Name,
+		(SELECT e.[Subdepartment] FROM [172.27.161.221\GPD].[Gordon_LIVE].[dbo].[GORDON\$Employee] as e where e.[No_] COLLATE Latin1_General_CI_AS = BadgeNum ) as plant
+		FROM BdkCLZG.dbo.WEA_PersData WHERE Func = 2 AND FlgAct = 1 AND PinCode = '".$pin."'"));
+
+
+		/*
+		$inteosleaders = DB::connection('sqlsrv2')->select(DB::raw("SELECT 
+			Name 
+		FROM [BdkCLZG].[dbo].[WEA_PersData] 
+		WHERE (Func = 2) and (FlgAct = 1) and (PinCode = ".$pin.")
+		UNION ALL
+		SELECT 
+			Name 
+		FROM [SBT-SQLDB01P\\INTEOSKKA].[BdkCLZKKA].[dbo].[WEA_PersData]
+		WHERE (Func = 2) and (FlgAct = 1) and (PinCode = ".$pin.")"));
+		*/
 
 		if (empty($inteosmech)) {
 			$msg = 'Mechanic with this PIN is not active';
@@ -54,8 +70,20 @@ class InteosLoginController extends Controller {
 			foreach ($inteosmech as $row) {
 				$mechanicid = $row->Cod;
     			$mechanic = $row->Name;
+
+    			if ($row->plant == 'Mechanics') {
+    				$mechanic_plant = 'Subotica';
+    			} else if  ($row->plant == 'Mechanics KIKINDA') {
+    				$mechanic_plant = 'Kikinda';
+    			} else {
+    				$mechanic_plant = 'missing';
+    			}
+
+    			// dd($mechanic_plant);
+
     			Session::set('mechanicid', $mechanicid);
     			Session::set('mechanic', $mechanic);
+    			Session::set('mechanic_plant', $mechanic_plant);
     		}
 
    			//if (Auth::check())

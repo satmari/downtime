@@ -52,6 +52,18 @@ class InteosLogin2Controller extends Controller {
 
 		$inteosll = DB::connection('sqlsrv2')->select(DB::raw("SELECT Cod,Name FROM BdkCLZG.dbo.WEA_PersData WHERE Func = 23 AND FlgAct = 1 AND PinCode = '".$pin."'"));
 
+		/*
+		$inteosleaders = DB::connection('sqlsrv2')->select(DB::raw("SELECT 
+			Name 
+		FROM [BdkCLZG].[dbo].[WEA_PersData] 
+		WHERE (Func = 23) and (FlgAct = 1) and (PinCode = ".$pin.")
+		UNION ALL
+		SELECT 
+			Name 
+		FROM [SBT-SQLDB01P\\INTEOSKKA].[BdkCLZKKA].[dbo].[WEA_PersData]
+		WHERE (Func = 23) and (FlgAct = 1) and (PinCode = ".$pin.")"));
+		*/
+
 		if (empty($inteosll)) {
 			$msg = 'LineLeader with this PIN is not active';
 		    return view('InteosLogin2.error',compact('msg'));

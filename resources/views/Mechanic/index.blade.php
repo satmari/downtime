@@ -5,10 +5,12 @@
     <div class="row vertical-center-row">
         <div class="text-center">
             <div class="panel panel-default">
-				<div class="panel-heading">Downtime table over 30 min repairing time for <b>{{$mechanic}}</b> </div>
+				<div class="panel-heading">Downtime table over 30 min repairing time for <b>{{$mechanic}}</b> 
+                    &nbsp &nbsp &nbsp
+                    <a href="clear_session_mechanic" class="btn btn-danger btn-xs ">Logout Mechanic</a> </div>
                 <a href="afterlogin" class="btn btn-success btn-xs ">List of downtimes without comment</a>
                 <a href="afterloginall" class="btn btn-info btn-xs ">List of ALL downtimes</a>
-                <a href="clear_session_mechanic" class="btn btn-danger btn-xs ">Logout Mechanic</a>
+                {{--<a href="clear_session_mechanic" class="btn btn-danger btn-xs ">Logout Mechanic</a>--}}
 				
 				<div class="input-group"> <span class="input-group-addon">Filter</span>
                     <input id="filter" type="text" class="form-control" placeholder="Type here...">

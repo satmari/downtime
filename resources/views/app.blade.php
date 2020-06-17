@@ -58,6 +58,7 @@
 
 					@if (Auth::guest())
 					<li><a href="{{ url('/inteoslogin') }}">Mechanic Downtime</a></li>
+					<li><a href="{{ url('/activity') }}">Mechanic Activity</a></li>
 					@endif
 					
 
