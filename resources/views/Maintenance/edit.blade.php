@@ -46,7 +46,7 @@
 					
 					{!! Form::open(['method'=>'POST', 'url'=>'/maintenance/delete/'.$maintenance->id]) !!}
 					{!! Form::hidden('id', $maintenance->id, ['class' => 'form-control']) !!}
-					{{--{!! Form::submit('Delete', ['class' => 'btn  btn-danger btn-xs center-block']) !!}--}}
+					{!! Form::submit('Delete', ['class' => 'btn  btn-danger btn-xs center-block']) !!}
 					{!! Form::close() !!}
 					
 				<hr>

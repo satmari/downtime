@@ -41,9 +41,6 @@
 					<tr>
 						<td>Informacije:</td>
 					</tr>
-					<tr>
-						<td><span style="color:red"><b>Ovaj deo palikacije (Activity) je u izgradnji</b></span></td>
-					</tr>
 					
 				</table>
 							

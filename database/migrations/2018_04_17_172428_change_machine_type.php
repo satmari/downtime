@@ -13,9 +13,10 @@ class ChangeMachineType extends Migration {
 	public function up()
 	{
 		//
-		Schema::table('machine_types', function (Blueprint $table) {
+		Schema::table('maintenance_checklists', function (Blueprint $table) {
 
-    		$table->string('machine_group')->nullable(); //added latter
+    		// $table->string('machine_group')->nullable(); //added latter
+    		$table->string('deleted')->nullable();	//new
     		
 		});
 	}

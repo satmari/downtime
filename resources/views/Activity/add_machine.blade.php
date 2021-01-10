@@ -7,7 +7,10 @@
 			<div class="text-center col-md-6 col-md-offset-3">
 				<div class="panel panel-default">
 					<div class="panel-heading">Link machine to this <b>{{ $activity_type }}</b> activity &nbsp &nbsp &nbsp &nbsp 
-					<a href="{{url('/afterlogin3')}}" class="btn btn-danger btn-xs">Go back</a> </div>
+					<a href="{{url('/afterlogin3')}}" class="btn btn-danger btn-xs">Go back</a> 
+					<a href="{{url('/add_maachine_all/'.$activity_id.' ')}}" class="btn btn-warning center-blo ck btn-xs"
+						>Add Machines to the list</a>
+					</div>
 
 					<div class="panel-body">
 						
@@ -48,7 +51,10 @@
 			<div class="text-center col-md-8 col-md-offset-2">
 				<div class="panel panel-default">
 
-					<div class="panel-heading">Machines already asigned to this activity</div>
+					<div class="panel-heading">Machines already asigned to this activity
+					<a href="{{url('/add_maintenance_all/'.$activity_id.' ')}}" class="btn btn-success center-blo ck btn-xs"
+							>Add Maintenance to all machines</a>
+						</div>
 					<table class="table" style="font-size: large">
 						
 						@foreach ($machines as $line)

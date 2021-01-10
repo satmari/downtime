@@ -22,6 +22,7 @@ class CreateMaintenanceChecklistsTable extends Migration {
 
 			$table->string('sort');
 			//$table->string('');
+			$table->string('deleted');	//new
 
 			$table->timestamps();
 		});

@@ -222,7 +222,7 @@ class MechineController extends Controller {
 		// dd($activity_id_check[0]->activity_id);
 		$activity_id = $activity_id_check[0]->activity_id;
 
-		$maintenance_checklist = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM maintenance_checklists ORDER BY sort asc"));
+		$maintenance_checklist = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM maintenance_checklists WHERE deleted is NULL ORDER BY sort asc"));
 		// dd($maintenance_checklist);
 
 		$maintenance_machine_check = DB::connection('sqlsrv')->select(DB::raw("SELECT maintenance_id FROM machine_maintanences WHERE machine_id = '".$machine_id."' "));
@@ -278,7 +278,7 @@ class MechineController extends Controller {
 
 		} /*else {
 
-			$maintenance_checklist = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM maintenance_checklists ORDER BY sort asc"));
+			$maintenance_checklist = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM maintenance_checklists WHERE deleted is NULL ORDER BY sort asc"));
 			// dd($maintenance_checklist);
 
 	    	return view('Activity.add_maintenance', compact('machine_id', 'activity_id','maintenance_checklist'));
@@ -315,6 +315,125 @@ class MechineController extends Controller {
 		
 
 	}
+
+	public function add_maintenance_all($id) 
+	{
+		// dd($id);
+		// $machine_id = $id;
+
+		// $activity_id_check = DB::connection('sqlsrv')->select(DB::raw("SELECT activity_id FROM machines WHERE id = '".$machine_id."' "));
+		// dd($activity_id_check[0]->activity_id);
+		// $activity_id = $activity_id_check[0]->activity_id;
+
+		$activity_id = $id;
+		$machine_id = '';
+
+		$maintenance_checklist = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM maintenance_checklists WHERE deleted is NULL ORDER BY sort asc"));
+		// dd($maintenance_checklist);
+
+		//$maintenance_machine_check = DB::connection('sqlsrv')->select(DB::raw("SELECT maintenance_id FROM machine_maintanences WHERE machine_id = '".$machine_id."' "));
+		// dd($maintenance_machine_check);
+		$maintenance_machine_check = NULL;
+
+    	return view('Activity.add_maintenance_all', compact('machine_id','activity_id','maintenance_checklist','maintenance_machine_check'));
+	}
+
+	public function add_maintenance_confirm_all(Request $request)
+	{
+		// $this->validate($request, ['machine_id'=>'required']);
+		$forminput = $request->all(); 
+		// dd($forminput);
+
+		// $machine_id = $forminput['machine_id'];
+		$activity_id = $forminput['activity_id'];
+		
+		$activity_status = DB::connection('sqlsrv')->select(DB::raw("SELECT status FROM activities WHERE id = '".$activity_id."' "));
+		$activity_status = $activity_status[0]->status;
+		// dd($activity_status);
+
+		$machines = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM machines WHERE activity_id = '".$activity_id."' "));
+		// dd($machines);
+
+		foreach ($machines as $line) {
+			// dd($line->id);
+
+			$maintenance_machine_check = DB::connection('sqlsrv')->select(DB::raw("SELECT maintenance_id FROM machine_maintanences WHERE machine_id = '".$line->id."' "));
+			// dd($maintenance_machine_check);
+			// var_dump($maintenance_machine_check);
+
+			// DB::connection('sqlsrv')->select(DB::raw("SET NOCOUNT ON ;DELETE FROM machine_maintanences WHERE machine_id = '".$line->id."' ;
+			// 	SELECT TOP 1 * FROM machine_maintanences"));
+
+			if (isset($forminput['maintenance_code'])) {
+				// dd($forminput['maintenance_code']);
+
+				$maintenance_code = $forminput['maintenance_code'];
+
+				for ($i=0; $i < count($maintenance_code); $i++) { 
+					// var_dump($maintenance_code[$i]);
+
+					list($maintenance_id, $maintenance) = explode('#', $maintenance_code[$i]);
+					// var_dump($maintenance_id);
+
+					$exist = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM machine_maintanences WHERE machine_id = '".$line->id."' AND maintenance_id = '".$maintenance_id."' "));
+					// dd($exist);
+
+					if (isset($exist[0]->id)) {
+						
+					} else {
+
+						try {
+						$table = new Machine_maintanence;
+
+						$table->machine_id = $line->id;
+						$table->maintenance_id = $maintenance_id;
+			
+						$table->save();
+						}
+						catch (\Illuminate\Database\QueryException $e) {
+							return view('Activity.error');
+						}
+					}
+				}
+			}
+		}
+
+		// $machines = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM machines WHERE activity_id = '".$activity_id."' "));
+			$machines = DB::connection('sqlsrv')->select(DB::raw("SELECT m.* , COUNT(mm.id) as c FROM [downtime].[dbo].machines as m
+			  LEFT JOIN [downtime].[dbo].[machine_maintanences] as mm on m.id = mm.machine_id
+			  WHERE m.[activity_id] = '".$activity_id."' 
+			  GROUP BY m.[id]
+			      ,m.[machine]
+			      ,m.[start_time]
+			      ,m.[machine_brand]
+			      ,m.[machine_type]
+			      ,m.[machine_code]
+			      ,m.[mechanic]
+			      ,m.[mechanicid]
+			      ,m.[activity_type]
+			      ,m.[activity_id]
+			      ,m.[created_at]
+			      ,m.[updated_at] "));
+
+		$mechanicid = Session::get('mechanicid');
+    	$mechanic = Session::get('mechanic');
+    	$mechanic_plant = Session::get('mechanic_plant');
+    	$activity_type = "MAINTENANCE";
+
+    	return view('Activity.add_machine', compact('mechanicid','mechanic','mechanic_plant','activity_id','activity_type','activity_status','machines'));
+	}
+
+	public function add_maachine_all($id) {
+
+		// dd($id);
+		$activity_id = $id;
+		$ses = Session::set('activity_id', $activity_id);
+		return view('Import.index', compact('activity_id'));
+
+	}
+
+
+
 
 
 	

@@ -41,20 +41,14 @@
 					<tr>
 						<td>Informacije:</td>
 					</tr>
-					{{-- 
-					<tr>
-						<td><span style="color:blue"><b>Aplikacija Downtime pocinje sa radom od 01.04.2018. za sve informacije obratite se normircima</b></span></td>
-					</tr>
-					--}}
+					
 					<tr>
 						<td><span style="color:red"><b>Sve probleme obavezno prijaviti IT sektoru.</b></span></td>
 					</tr>
 					<tr>
 						<td><span style="color:green"><b>Zatvarajte tabove u browseru!</b></span></td>
 					</tr>
-					<tr>
-						<td><span style="color:darkorchid">Da li imate predlog za pozadinsku sliku aplikacije?</span></td>
-					</tr>
+					
 
 					
 				</table>

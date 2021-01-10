@@ -45,6 +45,12 @@ Route::post('add_machine', 'MechineController@add_machine');
 Route::get('/add_maintenance/{id}', 'MechineController@add_maintenance');
 Route::post('add_maintenance_confirm', 'MechineController@add_maintenance_confirm');
 
+Route::get('add_maintenance_all/{id}', 'MechineController@add_maintenance_all');
+Route::post('add_maintenance_confirm_all', 'MechineController@add_maintenance_confirm_all');
+
+Route::get('add_maachine_all/{id}', 'MechineController@add_maachine_all');
+Route::post('postImportMachines', 'importController@postImportMachines');
+
 // Maintenance
 Route::get('/maintenance', 'MaintenanceController@index');
 Route::get('/maintenance_new', 'MaintenanceController@create');

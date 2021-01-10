@@ -49,7 +49,8 @@ class ActivityController extends Controller {
 		$inteosmech = DB::connection('sqlsrv2')->select(DB::raw("SELECT	Cod, Name,
 		(SELECT e.[Subdepartment] FROM [172.27.161.221\GPD].[Gordon_LIVE].[dbo].[GORDON\$Employee] as e where e.[No_] COLLATE Latin1_General_CI_AS = BadgeNum ) as plant
 		FROM BdkCLZG.dbo.WEA_PersData WHERE Func = 2 AND FlgAct = 1 AND PinCode = '".$pin."'"));
-
+		// dd($inteosmech);
+		
 		/*
 		$inteosleaders = DB::connection('sqlsrv2')->select(DB::raw("SELECT 
 			Name 

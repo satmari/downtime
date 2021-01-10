@@ -26,7 +26,7 @@ class MaintenanceController extends Controller {
 	public function index()
 	{
 		//
-		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM maintenance_checklists ORDER BY sort asc"));
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM maintenance_checklists WHERE deleted is NULL ORDER BY sort asc"));
 		return view('Maintenance.index', compact('data'));
 	}
 
@@ -103,7 +103,8 @@ class MaintenanceController extends Controller {
 	public function delete($id) {
 
 		$table = Maintenance_checklist::findOrFail($id);
-		$table->delete();
+		$table->deleted = date("d.m.Y");
+		$table->save();
 
 		return Redirect::to('/maintenance');
 	}
