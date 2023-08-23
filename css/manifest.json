@@ -1,0 +1,11 @@
+{ 
+
+  "name": "Downtime app", 
+
+  "short_name": "Downtime app", 
+
+  "start_url": "http://172.27.161.171/downtime", 
+
+  "display": "standalone"
+
+}
